@@ -13,6 +13,16 @@ export const api = createApi({
         },
     }),
     endpoints: (builder) => ({
+        // Login user: sends email and password, and returns JWT tokens with detailed messages
+        loginUser: builder.mutation<any, { email: string; password: string }>({
+            query: (credentials) => ({
+                url: '/auth/login/',
+                method: 'POST',
+                body: credentials,
+            }),
+            transformResponse: (response: any) => response,
+        }),
+
         // Fetch Rwanda locations and return the entire response
         getRwandaLocations: builder.query<any, void>({
             query: () => '/rwanda-locations/',
