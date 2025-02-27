@@ -30,6 +30,12 @@ export const api = createApi({
             query: () => '/web/tags/',
             transformResponse: (response: any) => response,
         }),
+
+        // Fetch all places with detailed info and return full response
+        getPlaces: builder.query<any, void>({
+            query: () => '/web/places/',
+            transformResponse: (response: any) => response,
+        }),
     }),
 });
 
@@ -37,4 +43,5 @@ export const {
     getRwandaLocations,
     getCategories,
     getTags,
+    getPlaces,
 } = api;
