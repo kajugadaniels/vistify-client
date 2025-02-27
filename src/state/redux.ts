@@ -40,5 +40,5 @@ export default function StoreProvider({
         storeRef.current = makeStore();
         setupListeners(storeRef.current.dispatch);
     }
-    return <Provider store={ storeRef.current }> { children } </Provider>;
+    return <Provider store={ storeRef.current }>{ children }</Provider>;
 }
