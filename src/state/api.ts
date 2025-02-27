@@ -24,10 +24,17 @@ export const api = createApi({
             query: () => '/web/categories/',
             transformResponse: (response: any) => response,
         }),
+
+        // Fetch all tags (with associated places) and return full response
+        getTags: builder.query<any, void>({
+            query: () => '/web/tags/',
+            transformResponse: (response: any) => response,
+        }),
     }),
 });
 
 export const {
     getRwandaLocations,
     getCategories,
+    getTags,
 } = api;
