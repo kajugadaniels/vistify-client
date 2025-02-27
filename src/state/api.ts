@@ -23,6 +23,16 @@ export const api = createApi({
             transformResponse: (response: any) => response,
         }),
 
+        // Logout user: sends refresh token and returns a detailed response on logout success/failure
+        logoutUser: builder.mutation<any, string>({
+            query: (refreshToken) => ({
+                url: '/auth/logout/',
+                method: 'POST',
+                body: { refresh: refreshToken },
+            }),
+            transformResponse: (response: any) => response,
+        }),
+
         // Fetch Rwanda locations and return the entire response
         getRwandaLocations: builder.query<any, void>({
             query: () => '/rwanda-locations/',
