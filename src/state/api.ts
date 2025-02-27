@@ -18,9 +18,16 @@ export const api = createApi({
             query: () => '/rwanda-locations/',
             transformResponse: (response: any) => response,
         }),
+
+        // Fetch all categories (with associated places) and return full response
+        getCategories: builder.query<any, void>({
+            query: () => '/web/categories/',
+            transformResponse: (response: any) => response,
+        }),
     }),
 });
 
 export const {
-    getRwandaLocations
+    getRwandaLocations,
+    getCategories,
 } = api;
