@@ -15,31 +15,31 @@ export const api = createApi({
     endpoints: (builder) => ({
         // Fetch Rwanda locations and return the entire response
         getRwandaLocations: builder.query<any, void>({
-            query: () => '/web/rwanda-locations/',
+            query: () => '/rwanda-locations/',
             transformResponse: (response: any) => response,
         }),
 
         // Fetch all categories (with associated places) and return full response
         getCategories: builder.query<any, void>({
-            query: () => '/web/categories/',
+            query: () => '/categories/',
             transformResponse: (response: any) => response,
         }),
 
         // Fetch all tags (with associated places) and return full response
         getTags: builder.query<any, void>({
-            query: () => '/web/tags/',
+            query: () => '/tags/',
             transformResponse: (response: any) => response,
         }),
 
         // Fetch all places with detailed info and return full response
         getPlaces: builder.query<any, void>({
-            query: () => '/web/places/',
+            query: () => '/places/',
             transformResponse: (response: any) => response,
         }),
 
         // Fetch details for a specific place and return full response
         placeDetails: builder.query<any, number>({
-            query: (id) => `/web/place/${id}/`,
+            query: (id) => `/place/${id}/`,
             transformResponse: (response: any) => response,
         }),
     }),
