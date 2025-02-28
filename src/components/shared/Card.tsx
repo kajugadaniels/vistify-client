@@ -19,7 +19,7 @@ const Card = ({
     placeLink,
 }: CardProps) => {
     // Get base URL from environment variable
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+    const baseUrl = process.env.NEXT_PUBLIC_IMAGE_BASE_URL || "";
     // Retrieve the first image by prefixing the base URL to the returned image path
     const firstImagePath =
         place.images && place.images.length > 0
