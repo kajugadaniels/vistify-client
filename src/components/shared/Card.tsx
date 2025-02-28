@@ -1,7 +1,8 @@
+import { Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-import { Heart } from "lucide-react";
+import { getMediaUrl } from "@/lib/apiConfig";
 
 interface CardProps {
   place: any; // Replace with a proper type if available
@@ -18,9 +19,13 @@ const Card = ({
   showFavoriteButton = true,
   placeLink,
 }: CardProps) => {
-  const [imgSrc, setImgSrc] = useState(
-    place.images && place.images.length > 0 ? place.images[0].image : "/placeholder.jpg"
-  );
+  const mediaUrl = getMediaUrl();
+  // Determine initial image source: if place.images exists, prepend mediaUrl; otherwise, use the placeholder.
+  const initialImgSrc =
+    place.images && place.images.length > 0 && place.images[0].image
+      ? `${mediaUrl}${place.images[0].image}`
+      : `${mediaUrl}placeholder.jpg`;
+  const [imgSrc, setImgSrc] = useState(initialImgSrc);
 
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-lg w-full mb-5">
@@ -32,7 +37,7 @@ const Card = ({
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            onError={() => setImgSrc("/placeholder.jpg")}
+            onError={() => setImgSrc(`${mediaUrl}placeholder.jpg`)}
           />
         </div>
         {showFavoriteButton && onFavoriteToggle && (
