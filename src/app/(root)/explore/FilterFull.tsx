@@ -2,14 +2,20 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { cn, formatEnumString } from "@/lib/utils";
 import { AmenityIcons, PropertyTypeIcons } from "@/lib/constants";
 
 const FilterFull = () => {
-  // Local state for design purposes only
+  // Local state for design-only filters
   const [location, setLocation] = useState("Kigali");
   const [propertyType, setPropertyType] = useState("any");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
@@ -18,6 +24,39 @@ const FilterFull = () => {
   const [squareFeet, setSquareFeet] = useState<[number, number]>([0, 5000]);
   const [amenities, setAmenities] = useState<string[]>([]);
   const [availableFrom, setAvailableFrom] = useState("");
+
+  // Dummy handlers to simulate applying and resetting filters
+  const handleApply = () => {
+    console.log("Applied filters:", {
+      location,
+      propertyType,
+      priceRange,
+      beds,
+      baths,
+      squareFeet,
+      amenities,
+      availableFrom,
+    });
+  };
+
+  const handleReset = () => {
+    setLocation("Kigali");
+    setPropertyType("any");
+    setPriceRange([0, 10000]);
+    setBeds("any");
+    setBaths("any");
+    setSquareFeet([0, 5000]);
+    setAmenities([]);
+    setAvailableFrom("");
+  };
+
+  const handleAmenityChange = (amenity: string) => {
+    setAmenities((prev) =>
+      prev.includes(amenity)
+        ? prev.filter((a) => a !== amenity)
+        : [...prev, amenity]
+    );
+  };
 
   return (
     <div className="bg-white rounded-lg px-4 h-full overflow-auto pb-10">
@@ -33,8 +72,8 @@ const FilterFull = () => {
               className="rounded-l-xl rounded-r-none border-r-0"
             />
             <Button
-              onClick={() => {}}
-              className="rounded-r-xl rounded-l-none border-l-none border-black shadow-none border hover:bg-primary-700 hover:text-primary-50"
+              onClick={() => console.log("Searched location:", location)}
+              className="rounded-r-xl rounded-l-none border-l-none border-black shadow-none hover:bg-primary-700 hover:text-primary-50"
             >
               <Search className="w-4 h-4" />
             </Button>
@@ -83,15 +122,12 @@ const FilterFull = () => {
         <div className="flex gap-4">
           <div className="flex-1">
             <h4 className="font-bold mb-2">Beds</h4>
-            <Select
-              value={beds || "any"}
-              onValueChange={(value) => setBeds(value)}
-            >
+            <Select value={beds} onValueChange={(value) => setBeds(value)}>
               <SelectTrigger className="w-full rounded-xl">
                 <SelectValue placeholder="Beds" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="any">Any beds</SelectItem>
+                <SelectItem value="any">Any Beds</SelectItem>
                 <SelectItem value="1">1+ bed</SelectItem>
                 <SelectItem value="2">2+ beds</SelectItem>
                 <SelectItem value="3">3+ beds</SelectItem>
@@ -101,15 +137,12 @@ const FilterFull = () => {
           </div>
           <div className="flex-1">
             <h4 className="font-bold mb-2">Baths</h4>
-            <Select
-              value={baths || "any"}
-              onValueChange={(value) => setBaths(value)}
-            >
+            <Select value={baths} onValueChange={(value) => setBaths(value)}>
               <SelectTrigger className="w-full rounded-xl">
                 <SelectValue placeholder="Baths" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="any">Any baths</SelectItem>
+                <SelectItem value="any">Any Baths</SelectItem>
                 <SelectItem value="1">1+ bath</SelectItem>
                 <SelectItem value="2">2+ baths</SelectItem>
                 <SelectItem value="3">3+ baths</SelectItem>
@@ -148,13 +181,7 @@ const FilterFull = () => {
                   "flex items-center space-x-2 p-2 border rounded-lg hover:cursor-pointer",
                   amenities.includes(amenity) ? "border-black" : "border-gray-200"
                 )}
-                onClick={() => {
-                  setAmenities((prev) =>
-                    prev.includes(amenity)
-                      ? prev.filter((a) => a !== amenity)
-                      : [...prev, amenity]
-                  );
-                }}
+                onClick={() => handleAmenityChange(amenity)}
               >
                 <Icon className="w-5 h-5" />
                 <Label>{formatEnumString(amenity)}</Label>
@@ -174,25 +201,16 @@ const FilterFull = () => {
           />
         </div>
 
-        {/* Apply and Reset buttons (dummy actions) */}
+        {/* Apply and Reset buttons */}
         <div className="flex gap-4 mt-6">
           <Button
-            onClick={() => console.log("Apply filters")}
+            onClick={handleApply}
             className="flex-1 bg-primary-700 text-white rounded-xl"
           >
             APPLY
           </Button>
           <Button
-            onClick={() => {
-              setPropertyType("any");
-              setPriceRange([0, 10000]);
-              setBeds("any");
-              setBaths("any");
-              setSquareFeet([0, 5000]);
-              setAmenities([]);
-              setAvailableFrom("");
-              setLocation("Kigali");
-            }}
+            onClick={handleReset}
             variant="outline"
             className="flex-1 rounded-xl"
           >
