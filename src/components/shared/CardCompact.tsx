@@ -18,9 +18,15 @@ const CardCompact = ({
     showFavoriteButton = true,
     placeLink,
 }: CardCompactProps) => {
-    const [imgSrc, setImgSrc] = useState(
-        place.images && place.images.length > 0 ? place.images[0].image : "/placeholder.jpg"
-    );
+    // Get base URL from environment variable
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+    // Retrieve the first image by prefixing the base URL to the returned image path
+    const firstImagePath =
+        place.images && place.images.length > 0
+            ? `${baseUrl}${place.images[0].image}`
+            : `${baseUrl}/placeholder.jpg`;
+
+    const [imgSrc, setImgSrc] = useState(firstImagePath);
 
     return (
         <div className="bg-white rounded-xl overflow-hidden shadow-lg w-full flex h-40 mb-5">
@@ -31,7 +37,7 @@ const CardCompact = ({
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    onError={() => setImgSrc("/placeholder.jpg")}
+                    onError={() => setImgSrc(`${baseUrl}/placeholder.jpg`)}
                 />
             </div>
             <div className="w-2/3 p-4 flex flex-col justify-between">
