@@ -24,6 +24,6 @@
     "types": [],
     "target": "ES2017"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(root)/landing/HeroSection.tsx", "src/app/(root)/explore/page.tsx", "src/app/(root)/explore/Listings.tsx", "src/components/shared/Card.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(root)/landing/HeroSection.tsx", "src/app/(root)/explore/page.tsx", "src/app/(root)/explore/Listings.tsx", "src/components/shared/Card.tsx", "src/components/shared/CardCompact.tsx"],
   "exclude": ["node_modules"]
 }
