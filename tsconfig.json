@@ -24,6 +24,6 @@
     "types": [],
     "target": "ES2017"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(root)/landing/HeroSection.tsx", "src/app/(root)/explore/page.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(root)/landing/HeroSection.tsx", "src/app/(root)/explore/page.tsx", "src/app/(root)/explore/Listings.tsx"],
   "exclude": ["node_modules"]
 }
