@@ -19,75 +19,95 @@ const FilterFull = () => {
   const [selectedVillage, setSelectedVillage] = useState("");
   const [address, setAddress] = useState("Kigali");
 
-  // Local state for dropdown options
+  // Options for each level
   const [provinces, setProvinces] = useState<string[]>([]);
   const [districts, setDistricts] = useState<string[]>([]);
   const [sectors, setSectors] = useState<string[]>([]);
   const [cells, setCells] = useState<string[]>([]);
   const [villages, setVillages] = useState<string[]>([]);
 
-  // Load provinces on component mount
+  // Load provinces once when component mounts
   useEffect(() => {
     setProvinces(Provinces());
   }, []);
 
-  // When a province is selected, update districts
+  // Update districts when province changes; reset lower levels
   useEffect(() => {
     if (selectedProvince) {
       const dists = Districts(selectedProvince) || [];
       setDistricts(dists);
-      // Clear lower levels
-      setSelectedDistrict("");
-      setSectors([]);
-      setSelectedSector("");
-      setCells([]);
-      setSelectedCell("");
-      setVillages([]);
-      setSelectedVillage("");
+    } else {
+      setDistricts([]);
     }
+    setSelectedDistrict("");
+    setSectors([]);
+    setSelectedSector("");
+    setCells([]);
+    setSelectedCell("");
+    setVillages([]);
+    setSelectedVillage("");
   }, [selectedProvince]);
 
-  // When a district is selected, update sectors
+  // Update sectors when district changes; reset lower levels
   useEffect(() => {
     if (selectedProvince && selectedDistrict) {
       const secs = Sectors(selectedProvince, selectedDistrict) || [];
       setSectors(secs);
-      // Clear lower levels
-      setSelectedSector("");
-      setCells([]);
-      setSelectedCell("");
-      setVillages([]);
-      setSelectedVillage("");
+    } else {
+      setSectors([]);
     }
+    setSelectedSector("");
+    setCells([]);
+    setSelectedCell("");
+    setVillages([]);
+    setSelectedVillage("");
   }, [selectedDistrict, selectedProvince]);
 
-  // When a sector is selected, update cells
+  // Update cells when sector changes; reset lower levels
   useEffect(() => {
     if (selectedProvince && selectedDistrict && selectedSector) {
-      const clls = Cells(selectedProvince, selectedDistrict, selectedSector) || [];
-      setCells(clls);
-      // Clear lower level
-      setSelectedCell("");
-      setVillages([]);
-      setSelectedVillage("");
+      try {
+        const clls = Cells(selectedProvince, selectedDistrict, selectedSector);
+        setCells(clls || []);
+      } catch (error) {
+        console.error("Error fetching cells:", error);
+        setCells([]);
+      }
+    } else {
+      setCells([]);
     }
+    setSelectedCell("");
+    setVillages([]);
+    setSelectedVillage("");
   }, [selectedSector, selectedDistrict, selectedProvince]);
 
-  // When a cell is selected, update villages
+  // Update villages when cell changes
   useEffect(() => {
-    if (selectedProvince && selectedDistrict && selectedSector && selectedCell) {
-      const vills = Villages(
-        selectedProvince,
-        selectedDistrict,
-        selectedSector,
-        selectedCell
-      ) || [];
-      setVillages(vills);
-      setSelectedVillage("");
+    if (
+      selectedProvince &&
+      selectedDistrict &&
+      selectedSector &&
+      selectedCell
+    ) {
+      try {
+        const vills = Villages(
+          selectedProvince,
+          selectedDistrict,
+          selectedSector,
+          selectedCell
+        );
+        setVillages(vills || []);
+      } catch (error) {
+        console.error("Error fetching villages:", error);
+        setVillages([]);
+      }
+    } else {
+      setVillages([]);
     }
+    setSelectedVillage("");
   }, [selectedCell, selectedSector, selectedDistrict, selectedProvince]);
 
-  // Dummy handler to apply filters
+  // Dummy handlers for applying and resetting filters
   const handleApply = () => {
     const appliedFilters = {
       address,
@@ -100,7 +120,6 @@ const FilterFull = () => {
     console.log("Applied Filters:", appliedFilters);
   };
 
-  // Dummy handler to reset filters to default values
   const handleReset = () => {
     setAddress("Kigali");
     setSelectedProvince("");
@@ -117,7 +136,7 @@ const FilterFull = () => {
   return (
     <div className="bg-white rounded-lg px-4 h-full overflow-auto pb-10">
       <div className="flex flex-col space-y-6">
-        {/* Address Search */}
+        {/* Address Input */}
         <div>
           <h4 className="font-bold mb-2">Address</h4>
           <Input
@@ -132,7 +151,7 @@ const FilterFull = () => {
         <div>
           <h4 className="font-bold mb-2">Province</h4>
           <Select
-            value={selectedProvince || "default"}
+            value={selectedProvince}
             onValueChange={(value) => setSelectedProvince(value)}
           >
             <SelectTrigger className="w-full rounded-xl border-primary-400">
@@ -152,7 +171,7 @@ const FilterFull = () => {
         <div>
           <h4 className="font-bold mb-2">District</h4>
           <Select
-            value={selectedDistrict || "default"}
+            value={selectedDistrict}
             onValueChange={(value) => setSelectedDistrict(value)}
           >
             <SelectTrigger className="w-full rounded-xl border-primary-400">
@@ -172,7 +191,7 @@ const FilterFull = () => {
         <div>
           <h4 className="font-bold mb-2">Sector</h4>
           <Select
-            value={selectedSector || "default"}
+            value={selectedSector}
             onValueChange={(value) => setSelectedSector(value)}
           >
             <SelectTrigger className="w-full rounded-xl border-primary-400">
@@ -192,7 +211,7 @@ const FilterFull = () => {
         <div>
           <h4 className="font-bold mb-2">Cell</h4>
           <Select
-            value={selectedCell || "default"}
+            value={selectedCell}
             onValueChange={(value) => setSelectedCell(value)}
           >
             <SelectTrigger className="w-full rounded-xl border-primary-400">
@@ -212,7 +231,7 @@ const FilterFull = () => {
         <div>
           <h4 className="font-bold mb-2">Village</h4>
           <Select
-            value={selectedVillage || "default"}
+            value={selectedVillage}
             onValueChange={(value) => setSelectedVillage(value)}
           >
             <SelectTrigger className="w-full rounded-xl border-primary-400">
