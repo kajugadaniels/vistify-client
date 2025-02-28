@@ -35,13 +35,13 @@ const Listings = () => {
                         <Card
                             key={place.id}
                             place={place}
-                            propertyLink={`/place/${place.id}`}
+                            placeLink={`/explore/${place.id}`}
                         />
                     ) : (
                         <CardCompact
                             key={place.id}
                             place={place}
-                            propertyLink={`/place/${place.id}`}
+                            placeLink={`/explore/${place.id}`}
                         />
                     )
                 )}
