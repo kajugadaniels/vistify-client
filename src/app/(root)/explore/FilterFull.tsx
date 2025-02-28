@@ -1,207 +1,234 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Provinces, Districts, Sectors, Cells, Villages } from "rwanda";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
 import {
   Select,
+  SelectTrigger,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { cn, formatEnumString } from "@/lib/utils";
-import { AmenityIcons, PropertyTypeIcons } from "@/lib/constants";
 
 const FilterFull = () => {
-  // Local state for design-only filters
-  const [location, setLocation] = useState("Kigali");
-  const [propertyType, setPropertyType] = useState("any");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
-  const [beds, setBeds] = useState("any");
-  const [baths, setBaths] = useState("any");
-  const [squareFeet, setSquareFeet] = useState<[number, number]>([0, 5000]);
-  const [amenities, setAmenities] = useState<string[]>([]);
-  const [availableFrom, setAvailableFrom] = useState("");
+  // Local state for each location level
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedSector, setSelectedSector] = useState("");
+  const [selectedCell, setSelectedCell] = useState("");
+  const [selectedVillage, setSelectedVillage] = useState("");
+  const [address, setAddress] = useState("Kigali");
 
-  // Dummy handlers to simulate applying and resetting filters
+  // Local state for dropdown options
+  const [provinces, setProvinces] = useState<string[]>([]);
+  const [districts, setDistricts] = useState<string[]>([]);
+  const [sectors, setSectors] = useState<string[]>([]);
+  const [cells, setCells] = useState<string[]>([]);
+  const [villages, setVillages] = useState<string[]>([]);
+
+  // Load provinces on component mount
+  useEffect(() => {
+    setProvinces(Provinces());
+  }, []);
+
+  // When a province is selected, update districts
+  useEffect(() => {
+    if (selectedProvince) {
+      const dists = Districts(selectedProvince) || [];
+      setDistricts(dists);
+      // Clear lower levels
+      setSelectedDistrict("");
+      setSectors([]);
+      setSelectedSector("");
+      setCells([]);
+      setSelectedCell("");
+      setVillages([]);
+      setSelectedVillage("");
+    }
+  }, [selectedProvince]);
+
+  // When a district is selected, update sectors
+  useEffect(() => {
+    if (selectedProvince && selectedDistrict) {
+      const secs = Sectors(selectedProvince, selectedDistrict) || [];
+      setSectors(secs);
+      // Clear lower levels
+      setSelectedSector("");
+      setCells([]);
+      setSelectedCell("");
+      setVillages([]);
+      setSelectedVillage("");
+    }
+  }, [selectedDistrict, selectedProvince]);
+
+  // When a sector is selected, update cells
+  useEffect(() => {
+    if (selectedProvince && selectedDistrict && selectedSector) {
+      const clls = Cells(selectedProvince, selectedDistrict, selectedSector) || [];
+      setCells(clls);
+      // Clear lower level
+      setSelectedCell("");
+      setVillages([]);
+      setSelectedVillage("");
+    }
+  }, [selectedSector, selectedDistrict, selectedProvince]);
+
+  // When a cell is selected, update villages
+  useEffect(() => {
+    if (selectedProvince && selectedDistrict && selectedSector && selectedCell) {
+      const vills = Villages(
+        selectedProvince,
+        selectedDistrict,
+        selectedSector,
+        selectedCell
+      ) || [];
+      setVillages(vills);
+      setSelectedVillage("");
+    }
+  }, [selectedCell, selectedSector, selectedDistrict, selectedProvince]);
+
+  // Dummy handler to apply filters
   const handleApply = () => {
-    console.log("Applied filters:", {
-      location,
-      propertyType,
-      priceRange,
-      beds,
-      baths,
-      squareFeet,
-      amenities,
-      availableFrom,
-    });
+    const appliedFilters = {
+      address,
+      province: selectedProvince,
+      district: selectedDistrict,
+      sector: selectedSector,
+      cell: selectedCell,
+      village: selectedVillage,
+    };
+    console.log("Applied Filters:", appliedFilters);
   };
 
+  // Dummy handler to reset filters to default values
   const handleReset = () => {
-    setLocation("Kigali");
-    setPropertyType("any");
-    setPriceRange([0, 10000]);
-    setBeds("any");
-    setBaths("any");
-    setSquareFeet([0, 5000]);
-    setAmenities([]);
-    setAvailableFrom("");
-  };
-
-  const handleAmenityChange = (amenity: string) => {
-    setAmenities((prev) =>
-      prev.includes(amenity)
-        ? prev.filter((a) => a !== amenity)
-        : [...prev, amenity]
-    );
+    setAddress("Kigali");
+    setSelectedProvince("");
+    setDistricts([]);
+    setSelectedDistrict("");
+    setSectors([]);
+    setSelectedSector("");
+    setCells([]);
+    setSelectedCell("");
+    setVillages([]);
+    setSelectedVillage("");
   };
 
   return (
     <div className="bg-white rounded-lg px-4 h-full overflow-auto pb-10">
       <div className="flex flex-col space-y-6">
-        {/* Location */}
+        {/* Address Search */}
         <div>
-          <h4 className="font-bold mb-2">Location</h4>
-          <div className="flex items-center">
-            <Input
-              placeholder="Enter location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="rounded-l-xl rounded-r-none border-r-0"
-            />
-            <Button
-              onClick={() => console.log("Searched location:", location)}
-              className="rounded-r-xl rounded-l-none border-l-none border-black shadow-none hover:bg-primary-700 hover:text-primary-50"
-            >
-              <Search className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Property Type */}
-        <div>
-          <h4 className="font-bold mb-2">Property Type</h4>
-          <div className="grid grid-cols-2 gap-4">
-            {Object.entries(PropertyTypeIcons).map(([type, Icon]) => (
-              <div
-                key={type}
-                className={cn(
-                  "flex flex-col items-center justify-center p-4 border rounded-xl cursor-pointer",
-                  propertyType === type ? "border-black" : "border-gray-200"
-                )}
-                onClick={() => setPropertyType(type)}
-              >
-                <Icon className="w-6 h-6 mb-2" />
-                <span>{type}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Price Range */}
-        <div>
-          <h4 className="font-bold mb-2">Price Range (Monthly)</h4>
-          <Slider
-            min={0}
-            max={10000}
-            step={100}
-            value={priceRange}
-            onValueChange={(value: any) =>
-              setPriceRange(value as [number, number])
-            }
-          />
-          <div className="flex justify-between mt-2">
-            <span>${priceRange[0]}</span>
-            <span>${priceRange[1]}</span>
-          </div>
-        </div>
-
-        {/* Beds and Baths */}
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <h4 className="font-bold mb-2">Beds</h4>
-            <Select value={beds} onValueChange={(value) => setBeds(value)}>
-              <SelectTrigger className="w-full rounded-xl">
-                <SelectValue placeholder="Beds" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any Beds</SelectItem>
-                <SelectItem value="1">1+ bed</SelectItem>
-                <SelectItem value="2">2+ beds</SelectItem>
-                <SelectItem value="3">3+ beds</SelectItem>
-                <SelectItem value="4">4+ beds</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex-1">
-            <h4 className="font-bold mb-2">Baths</h4>
-            <Select value={baths} onValueChange={(value) => setBaths(value)}>
-              <SelectTrigger className="w-full rounded-xl">
-                <SelectValue placeholder="Baths" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any Baths</SelectItem>
-                <SelectItem value="1">1+ bath</SelectItem>
-                <SelectItem value="2">2+ baths</SelectItem>
-                <SelectItem value="3">3+ baths</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Square Feet */}
-        <div>
-          <h4 className="font-bold mb-2">Square Feet</h4>
-          <Slider
-            min={0}
-            max={5000}
-            step={100}
-            value={squareFeet}
-            onValueChange={(value) =>
-              setSquareFeet(value as [number, number])
-            }
-            className="[&>.bar]:bg-primary-700"
-          />
-          <div className="flex justify-between mt-2">
-            <span>{squareFeet[0]} sq ft</span>
-            <span>{squareFeet[1]} sq ft</span>
-          </div>
-        </div>
-
-        {/* Amenities */}
-        <div>
-          <h4 className="font-bold mb-2">Amenities</h4>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(AmenityIcons).map(([amenity, Icon]) => (
-              <div
-                key={amenity}
-                className={cn(
-                  "flex items-center space-x-2 p-2 border rounded-lg hover:cursor-pointer",
-                  amenities.includes(amenity) ? "border-black" : "border-gray-200"
-                )}
-                onClick={() => handleAmenityChange(amenity)}
-              >
-                <Icon className="w-5 h-5" />
-                <Label>{formatEnumString(amenity)}</Label>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Available From */}
-        <div>
-          <h4 className="font-bold mb-2">Available From</h4>
+          <h4 className="font-bold mb-2">Address</h4>
           <Input
-            type="date"
-            value={availableFrom}
-            onChange={(e) => setAvailableFrom(e.target.value)}
-            className="rounded-xl"
+            placeholder="Enter address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            className="rounded-xl border-primary-400"
           />
         </div>
 
-        {/* Apply and Reset buttons */}
+        {/* Province Selector */}
+        <div>
+          <h4 className="font-bold mb-2">Province</h4>
+          <Select
+            value={selectedProvince || "default"}
+            onValueChange={(value) => setSelectedProvince(value)}
+          >
+            <SelectTrigger className="w-full rounded-xl border-primary-400">
+              <SelectValue placeholder="Select Province" />
+            </SelectTrigger>
+            <SelectContent>
+              {provinces.map((prov) => (
+                <SelectItem key={prov} value={prov}>
+                  {prov}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* District Selector */}
+        <div>
+          <h4 className="font-bold mb-2">District</h4>
+          <Select
+            value={selectedDistrict || "default"}
+            onValueChange={(value) => setSelectedDistrict(value)}
+          >
+            <SelectTrigger className="w-full rounded-xl border-primary-400">
+              <SelectValue placeholder="Select District" />
+            </SelectTrigger>
+            <SelectContent>
+              {districts.map((dist) => (
+                <SelectItem key={dist} value={dist}>
+                  {dist}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Sector Selector */}
+        <div>
+          <h4 className="font-bold mb-2">Sector</h4>
+          <Select
+            value={selectedSector || "default"}
+            onValueChange={(value) => setSelectedSector(value)}
+          >
+            <SelectTrigger className="w-full rounded-xl border-primary-400">
+              <SelectValue placeholder="Select Sector" />
+            </SelectTrigger>
+            <SelectContent>
+              {sectors.map((sec) => (
+                <SelectItem key={sec} value={sec}>
+                  {sec}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Cell Selector */}
+        <div>
+          <h4 className="font-bold mb-2">Cell</h4>
+          <Select
+            value={selectedCell || "default"}
+            onValueChange={(value) => setSelectedCell(value)}
+          >
+            <SelectTrigger className="w-full rounded-xl border-primary-400">
+              <SelectValue placeholder="Select Cell" />
+            </SelectTrigger>
+            <SelectContent>
+              {cells.map((cll) => (
+                <SelectItem key={cll} value={cll}>
+                  {cll}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Village Selector */}
+        <div>
+          <h4 className="font-bold mb-2">Village</h4>
+          <Select
+            value={selectedVillage || "default"}
+            onValueChange={(value) => setSelectedVillage(value)}
+          >
+            <SelectTrigger className="w-full rounded-xl border-primary-400">
+              <SelectValue placeholder="Select Village" />
+            </SelectTrigger>
+            <SelectContent>
+              {villages.map((vill) => (
+                <SelectItem key={vill} value={vill}>
+                  {vill}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Apply and Reset Buttons */}
         <div className="flex gap-4 mt-6">
           <Button
             onClick={handleApply}
@@ -214,7 +241,7 @@ const FilterFull = () => {
             variant="outline"
             className="flex-1 rounded-xl"
           >
-            Reset Filters
+            RESET
           </Button>
         </div>
       </div>
